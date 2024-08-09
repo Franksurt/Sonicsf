@@ -1,1 +1,128 @@
-<a href="https://github.com/Franksurt/Sonicsf/blob/main/Profile.html">here</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .profile-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-header .profile-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            margin-right: 20px;
+        }
+
+        .post-container {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .post-header,
+        .post-caption {
+            margin-bottom: 10px;
+        }
+
+        .post-collage-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .post-collage-container .slide-counter {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .boton {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-icon" id="profileIcon"></div>
+            <h1 id="username"></h1>
+        </div>
+        <div class="edit-profile">
+            <button class="boton" onclick="logout()">Cerrar sesión</button>
+        </div>
+        <div id="postContainer"></div>
+    </div>
+
+    <script src="path/to/your/datos-d.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const profileIcon = document.getElementById('profileIcon');
+            const usernameElem = document.getElementById('username');
+            const postContainer = document.getElementById('postContainer');
+
+            // Obtener datos del usuario actual
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            if (currentUser) {
+                profileIcon.style.backgroundImage = `url(${currentUser.avatar})`;
+                usernameElem.textContent = currentUser.username;
+
+                // Cargar posts del usuario
+                const posts = JSON.parse(localStorage.getItem('posts')) || [];
+                const userPosts = posts.filter(post => post.username === currentUser.username);
+
+                userPosts.forEach(post => {
+                    const mediaHtml = post.mediaUrls.map(url => `<img src="${url}" alt="media">`).join("");
+                    postContainer.innerHTML += `
+                        <div class="post-header">
+                            <img src="${post.avatar}" alt="${post.username}" class="avatar">
+                            <span class="username">${post.username} ${post.isVerified ? '<i class="bi bi-patch-check-fill" style="color: #3897f0;"></i>' : ''}</span>
+                        </div>
+                        <div class="post-collage-container">
+                            <div class="post-collage">
+                                ${mediaHtml}
+                            </div>
+                            <div class="post-collage-container">
+                                <div class="slide-counter">1 / ${post.mediaUrls.length}</div>
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <i class="fas fa-heart" onclick="toggleLike(this)"></i>
+                            <i class="fas fa-share" onclick="sharePost(this)"></i>
+                            <i class="fas fa-trash delete-btn" onclick="deletePost(this, '${post.password}', ${post.id})"></i>
+                        </div>
+                        <div class="post-caption">
+                            <span class="username">${post.username}</span>
+                            <span class="short-description">${post.shortDescription}</span>
+                            <span class="full-description">${post.fullDescription}</span>
+                            <span class="post-date">${post.postDate}</span>
+                            <b class="show-more-btn" onclick="toggleDescription(this)">Mostrar más</b>
+                        </div>
+                    `;
+                });
+            }
+
+            window.logout = function () {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html'; // Redirige al login
+            }
+        });
+    </script>
+</body>
+</html>
